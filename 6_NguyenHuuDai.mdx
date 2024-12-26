@@ -1,0 +1,284 @@
+﻿select Sales on columns from [DW Global Superstore];
+
+
+select non empty Sales on columns,
+non empty [Dim Time].[Order Year].[Order Year] on rows
+from [DW Global Superstore];
+
+
+
+select non empty Sales on 0,
+non empty {[Dim Time].[Order Year].[2012], [Dim Time].[Order Year].[2014]} on 1
+from [DW Global Superstore];
+
+
+select non empty Sales on 1,
+non empty [Dim Time].[Order Year].[Order Year] on 0
+from [DW Global Superstore];
+
+
+
+select non empty {Sales,Profit} on 0,
+non empty [Dim Time].[Order Year].[Order Year] on 1
+from [DW Global Superstore];
+
+
+
+select non empty {Sales,Profit} on 0,
+non empty [Dim Time].[Order Year].[Order Year] on 1
+from [DW Global Superstore]
+where [Dim Location].[Country].[Vietnam];
+
+
+
+select non empty {Sales, Profit} on 0,
+non empty [Dim Time].[Order Year].[Order Year] on 1
+from [DW Global Superstore]
+where {[Dim Location].[Country].[Vietnam], [Dim Location].[Country].[India]};
+
+
+
+select non empty {Sales, Profit} on 0,
+non empty [Dim Time].[Order Year].[Order Year]*
+{
+	[Dim Location].[Country].[Vietnam], 
+	[Dim Location].[Country].[India]
+} on 1
+from [DW Global Superstore];
+
+ 
+-- hien thi doanh thu, loi nhuan theo nam tai VN
+
+select non empty {Sales, Profit} on 0,
+non empty [Dim Time].[Order Year].[Order Year] * [Dim Location].[Country].[Vietnam] on 1
+from [DW Global Superstore];
+
+
+	
+-- hien thi doanh thu, loi nhuan theo nam tai VN theo phan khuc khach hang
+
+select non empty {Sales,Profit} on 0,
+non empty
+	[Dim Time].[Order Year].[Order Year] *
+	[Dim Location].[Country].[Vietnam] *
+	[Dim Customers].[Segment].[Segment]
+on 1
+from [DW Global Superstore];
+
+
+
+-- hien thi doanh thu, loi nhuan theo nam tai VN theo phan khuc khach hang
+
+select non empty {Sales,Profit} on 0,
+non empty 
+	[Dim Time].[Order Year].[Order Year] *
+	[Dim Customers].[Segment].[Segment]
+on 1
+from [DW Global Superstore]
+where [Dim Location].[Country].[Vietnam];
+
+
+
+-- filter (set, exp) hien thi doanh thu theo nam, hien thi chi tiet doanh thu > 3000000
+
+select non empty Sales on 0,
+non empty [Dim Time].[Order Year].[Order Year] on 1
+from [DW Global Superstore];
+
+
+select non empty Sales on 0,
+non empty filter([Dim Time].[Order Year].[Order Year], Sales > 3000000) on 1
+from [DW Global Superstore];
+
+
+
+-- sap xep order (set, exp,asc/desc) hien thi doanh thu theo nam, sx giam dan theo nam
+
+select non empty Sales on 0,
+non empty [Dim Time].[Order Year].[Order Year] on 1
+from [DW Global Superstore];
+
+
+select non empty Sales on 0,
+non empty order([Dim Time].[Order Year].[Order Year], Sales, asc) on 1
+from [DW Global Superstore];
+
+
+
+-- with member
+
+with member CK as [Measures].[Sales]*0.15
+select CK on 0,
+non empty [Dim Time].[Order Year].[Order Year] on 1
+from [DW Global Superstore];
+
+
+-- cho biet doanh thu theo tung thang, tung nam
+
+select [Measures].[Sales] on 0,
+non empty [Dim Time].[Order Year].[Order Year] * [Dim Time].[Ship Month].members on 1
+from [DW Global Superstore];
+
+
+
+
+/*----------------------- Bài tập 1: Sử dụng ngôn ngữ MDX* -----------------------*/
+
+//Câu 1: Cho biết tổng lợi nhuận (Profit), doanh thu (Sales), số lượng (Quantity), chi phí
+//vận chuyển (Shipping Cost), chiết khấu,....hiển thị dữ liệu theo cột.
+
+
+select non empty {Sales, Profit, Quantity, [Measures].[Shipping Cost]} on 0
+from [DW Global Superstore];
+
+
+//Câu 2: Cho biết tổng lợi nhuận (Profit) theo nhóm hàng (Category). Trong đó lợi nhuận
+//hiển thị trên cột, loại hàng hiển thị trên dòng.
+
+
+select non empty Profit on 0,
+non empty [Dim Product].[Category].[Category] on 1
+from [DW Global Superstore];
+
+
+//Câu 3: Cho biết tổng lợi nhuận (Profit) theo nhóm hàng (Category), sắp xếp lợi nhuận theo
+//thứ tự tăng dần/ giảm dần. Trong đó lợi nhuận hiển thị trên cột, loại hàng hiển thị trên dòng.
+
+select non empty Profit on 0,
+non empty order([Dim Product].[Category].[Category], Profit, desc) on 1
+from [DW Global Superstore];
+
+
+
+select non empty Profit on 0,
+non empty order([Dim Product].[Category].[Category], Profit, asc) on 1
+from [DW Global Superstore];
+
+//Câu 4: Cho biết tổng lợi nhuận của 2 nhóm hàng “Technology” và “Furniture”.
+
+select non empty Sales on 0,
+non empty [Dim Time].[Order Year].[Order Year] on 1
+from [DW Global Superstore]
+where {[Dim Product].[Category].[Technology], [Dim Product].[Category].[Furniture]};
+
+
+//Câu 5: Cho biết tổng lợi nhuận (hiển thị cột) của 2 nhóm hàng “Technology” và
+//“Furniture” (hiển thị trên dòng) của thị trường Châu Âu (Europe).
+
+select non empty Sales on 0,
+non empty {
+	[Dim Product].[Category].[Technology], 
+	[Dim Product].[Category].[Furniture] 
+	}
+on 1
+from [DW Global Superstore]
+where [Dim Location].[Market].[Europe];
+
+
+
+//Câu 6: Cho biết tổng lợi nhuận (hiển thị cột) của 2 nhóm hàng “Technology” và
+//“Furniture” (hiển thị trên dòng) của thị trường Châu Âu (Europe) và thị trường Châu phi
+//(Africa).
+
+select non empty Sales on 1,
+non empty {
+	[Dim Product].[Category].[Technology], 
+	[Dim Product].[Category].[Furniture] 
+	}
+on 0
+from [DW Global Superstore]
+where {[Dim Location].[Market].[Europe], [Dim Location].[Market].[Africa]};
+
+
+//Câu 7: Cho biết tổng lợi nhuận, tổng doanh thu theo từng nhóm hàng, từng nhóm hàng
+//nhỏ (SubCategory).
+
+select non empty Sales on 0,
+non empty [Dim Time].[Order Year].[Order Year] on 1
+from [DW Global Superstore]
+where {[Dim Product].[Category].[Category], [Dim Product].[Category].[Sub Category]};
+
+//Câu 8: Cho biết tổng lợi nhuận, tổng doanh số bán của từng hóm hàng nhỏ trong nhóm
+//hàng “Furniture”, sắp xếp lợi nhuận giảm dần.
+
+select non empty {Sales, Profit} on 0,
+non empty order([Dim Time].[Order Year].[Order Year] * [Dim Product].[Category].[Furniture], Profit, desc) on 1
+from [DW Global Superstore];
+
+
+//Câu 9: Cho biết tổng lợi nhuận theo từng nhóm hàng (Category) theo từng thị trường
+//(market).
+
+select Profit on 0,
+non empty [Dim Location].[Market].children * [Dim Product].[Category].children on 1
+from [DW Global Superstore];
+
+//Câu 10: Cho biết tổng lợi nhuận theo từng nhóm hàng của các quốc gia ở thị trường Châu
+//Âu (Europe).
+
+select Profit on 0,
+non empty [Dim Location].[Market].[Europe] * [Dim Product].[Category].children on 1
+from [DW Global Superstore];
+
+//Câu 11: Cho biết tổng lợi nhuận của các nhóm hàng theo từng quốc gia trong năm 2014.
+
+select Profit on 0,
+non empty [Dim Product].[Category].children * [Dim Location].[Country].[Country] on 1
+from [DW Global Superstore];
+
+
+//Câu 12: Cho biết tổng lợi nhuận, tổng doanh thu, tổng số đơn đặt hàng, tổng số lượng bán,
+//tổng chi phí vận chuyển, tổng chiết khấu theo từng nhóm hàng, từng nhóm khách hàng
+//theo từng năm.
+
+select {Profit, Sales, [Measures].[Fact Order Count], Quantity, [Measures].[Shipping Cost], Discount} on 0,
+non empty [Dim Product].[Category].children * [Dim Customers].[Segment].children * [Dim Time].[Order Year].children on 1
+from [DW Global Superstore];
+
+//
+//Câu 13: Cho biết lợi nhuận theo từng nhóm hàng, từng nhóm hàng nhỏ, theo từng thị
+//trường, từng nhóm khách hàng.
+
+select Profit on 0,
+non empty 
+	[Dim Product].[Category].[Category] * 
+	[Dim Product].[Sub Category].[Sub Category] *
+	[Dim Location].[Market].[Market] *
+	[Dim Customers].[Segment].[Segment]
+on 1
+from [DW Global Superstore];
+
+//Câu 14: Cho biết doanh thu các nhóm hàng trong năm 2014
+
+select Profit on 0,
+non empty [Dim Time].[Order Year].[2014] * [Dim Product].[Category].[Category] on 1
+from [DW Global Superstore];
+
+
+//Câu 15: Cho biết các nhóm hàng trong năm 2014 có doanh thu trên 16.000
+
+select Sales on 0,
+non empty filter ([Dim Time].[Order Year].[2014] * [Dim Product].[Category].[Category], Sales > 16000) on 1
+from [DW Global Superstore];
+
+//Câu 16: Cho biết lợi nhuận của các nhóm hàng, nhóm hàng nhỏ tại thị trường Châu Âu
+//trên 30.000
+
+select Profit on 0,
+non empty filter ([Dim Product].[Category].[Category] * [Dim Location].[Market].[Europe], Profit > 30000) on 1
+from [DW Global Superstore];
+
+
+//Câu 17: Cho biết lợi nhuận thực tế năm 2023 của tất cả các nhóm hàng, lợi nhuận thực =
+//lợi nhuận - khuyến mãi. Năm 2013 khuyến mãi tất cả các nhóm hàng 10%
+
+with member LN as [Measures].[Profit]-[Measures].[Profit] * 0.1
+select non empty LN on 0,
+non empty [Dim Product].[Category].children on 1 
+from [DW Global Superstore];
+
+//Câu 18: Cho biết 5 thành phố có doanh thu nhiều nhất
+
+select Profit on 0,
+topcount(order([Dim Location].[City].[City], Profit, desc), 5) on 1
+from [DW Global Superstore];
